@@ -18,7 +18,8 @@ class SurveysView extends View {
 		}
 
 		foreach ($model->getSurveys() as $survey) {
-			$survey->computePercentages();
+			var_dump($survey);
+			//$survey->computePercentages();
 			require("templates/survey.inc.php");
 		}
 	}

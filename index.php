@@ -25,14 +25,17 @@ function getAction() {
 		'SignUpForm',
 		'UpdateUserForm',
 		'UpdateUser',
+		'GetMySurveys',
+		'AddSurvey',
+		'AddSurveyForm',
 /*
 
 
 
 
-			'AddSurveyForm',
-			'AddSurvey',
-			'GetMySurveys',
+
+
+
 			'Search',
 			'Vote'*/);
 

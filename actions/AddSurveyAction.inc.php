@@ -27,7 +27,31 @@ class AddSurveyAction extends Action {
 	 * @see Action::run()
 	 */
 	public function run() {
-		/* TODO  */
+
+		if(empty($_POST['questionSurvey'])){
+			return "La question est obligatoire";
+		}
+		if(empty($_POST['responseSurvey1']) || empty($_POST['responseSurvey2'])){
+			return "Vous devez proposer au moins 2 réponses";
+		}
+
+		$survey = new Survey($this->getSessionLogin(), htmlentities($_POST['questionSurvey']));
+		$survey->addResponse( htmlentities($_POST['responseSurvey1']));
+		$survey->addResponse( htmlentities($_POST['responseSurvey2']));
+		if (!empty($_POST['responseSurvey3'])){
+			$survey->addResponse( htmlentities($_POST['responseSurvey3']));
+		}
+		if (!empty($_POST['responseSurvey4'])){
+			$survey->addResponse( htmlentities($_POST['responseSurvey4']));
+		}
+		if (!empty($_POST['responseSurvey5'])){
+			$survey->addResponse( htmlentities($_POST['responseSurvey5']));
+		}
+
+		$this->database->saveSurvey($survey);
+		foreach ($survey->getResponses() as $response){
+			$this->database->saveResponse($response);
+		}
 	}
 
 }

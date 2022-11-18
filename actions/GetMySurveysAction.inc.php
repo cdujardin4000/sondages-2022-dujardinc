@@ -18,10 +18,14 @@ class GetMySurveysAction extends Action {
 
 		if ($this->getSessionLogin()===null) {
 			$this->setMessageView("Vous devez être authentifié.");
-			return;
-		}
 
-		/* TODO  */
+		}
+		$user = $this->getSessionLogin();
+		$surveys = $this->database->loadSurveysByOwner($user);
+		var_dump($surveys);
+		$this->setModel(new SurveysModel());
+		$this->getModel()->setSurveys($surveys);
+		$this->setView(getViewByName('Surveys'));
 	}
 
 }

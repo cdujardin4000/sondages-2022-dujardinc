@@ -173,13 +173,10 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 */
 	public function updateUser(string $nickname, string $password): bool|string
 	{
-		$err_mess = "";
 		if($this->checkPasswordValidity($password) === 2) {
-			var_dump(2);
-			var_dump("Le mot de passe doit contenir entre 3 et 10 caractères...\n");
+
 			return "Le mot de passe doit contenir entre 3 et 10 caractères...\n";
 		}
-var_dump($err_mess);
 		$stmt = $this->connection->prepare("UPDATE users SET password=? WHERE nickname=?");
 		return $stmt->execute([$password, $nickname]);
 	}
@@ -188,12 +185,22 @@ var_dump($err_mess);
 	 * Sauvegarde un sondage dans la base de donnée et met à jour les indentifiants
 	 * du sondage et des réponses.
 	 *
-	 * @param Survey $survey Sondage à sauvegarder.
+	 * @param Survey survey Sondage à sauvegarder.
 	 * @return boolean True si la sauvegarde a été réalisée avec succès, false sinon.
 	 */
-	public function saveSurvey(&$survey) {
-		/* TODO  */
-		return true;
+	public function saveSurvey($survey) {
+		$survey_id = $this->connection->query(
+			"SELECT id FROM surveys ORDER BY id DESC LIMIT 1"
+		)->fetch(PDO::FETCH_OBJ);
+
+		$stmt = $this->connection->prepare(
+			"INSERT INTO surveys (id, question, owner) VALUES (:id, :question, :owner)"
+		);
+		$stmt->execute([
+			':id' => ++$survey_id->id ,
+			':question' => $survey->getQuestion(),
+			':owner' => $survey->getOwner()
+		]);
 	}
 
 	/**
@@ -202,19 +209,38 @@ var_dump($err_mess);
 	 * @param Survey $response Réponse à sauvegarder.
 	 * @return boolean True si la sauvegarde a été réalisée avec succès, false sinon.
 	 */
-	private function saveResponse(&$response) {
-		/* TODO  */
-		return true;
+	public function saveResponse($response) {
+		$survey_id = $this->connection->query(
+			"SELECT id FROM surveys ORDER BY id DESC LIMIT 1"
+		)->fetch(PDO::FETCH_OBJ);
+		$response_id = $this->connection->query(
+			"SELECT id FROM responses ORDER BY id DESC LIMIT 1"
+		)->fetch(PDO::FETCH_OBJ);
+		$stmt = $this->connection->prepare(
+			"INSERT INTO responses (id, id_survey, title) VALUES (:id, :id_survey ,:title)"
+		);
+		$stmt->execute([
+			':id' => ++$response_id->id,
+			':id_survey' => ++$survey_id->id,
+			':title' => $response
+		]);
 	}
 
 	/**
 	 * Charge l'ensemble des sondages créés par un utilisateur.
 	 *
 	 * @param string $owner Pseudonyme de l'utilisateur.
-	 * @return array(Survey)|boolean Sondages trouvés par la fonction ou false si une erreur s'est produite.
+	 * @return bool|array(Survey)| Sondages trouvés par la fonction ou false si une erreur s'est produite.
 	 */
 	public function loadSurveysByOwner($owner) {
-		/* TODO  */
+		$surveys = $this->connection->query(
+			"SELECT * FROM surveys WHERE owner='$owner'",
+			PDO::FETCH_OBJ
+		)->fetchAll();
+		if($surveys) {
+			return $surveys;
+		}
+		return false;
 	}
 
 	/**
