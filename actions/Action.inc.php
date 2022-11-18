@@ -4,9 +4,9 @@ require_once("models/MessageModel.inc.php");
 require_once("models/Database.inc.php");
 
 abstract class Action {
-	private ?View $view;
-	private ?Model $model;
-	protected Database $database;
+	private $view;
+	private $model;
+	protected $database;
 
 	/**
 	 * Construit une instance de la classe Action.

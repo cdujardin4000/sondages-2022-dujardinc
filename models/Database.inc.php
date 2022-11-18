@@ -171,9 +171,17 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 * @param string $password Nouveau mot de passe.
 	 * @return boolean|string True si le mot de passe a été modifié, un message d'erreur sinon.
 	 */
-	public function updateUser($nickname, $password) {
-		/* TODO  */
-		return true;
+	public function updateUser(string $nickname, string $password): bool|string
+	{
+		$err_mess = "";
+		if($this->checkPasswordValidity($password) === 2) {
+			var_dump(2);
+			var_dump("Le mot de passe doit contenir entre 3 et 10 caractères...\n");
+			return "Le mot de passe doit contenir entre 3 et 10 caractères...\n";
+		}
+var_dump($err_mess);
+		$stmt = $this->connection->prepare("UPDATE users SET password=? WHERE nickname=?");
+		return $stmt->execute([$password, $nickname]);
 	}
 
 	/**

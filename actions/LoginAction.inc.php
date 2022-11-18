@@ -22,7 +22,7 @@ class LoginAction extends Action {
         $this->setModel(new MessageModel);
         if ($this->database->checkPassword($_POST['nickname'], $_POST['password'])){
             $this->setSessionLogin($_POST['nickname']);
-            $this->getModel()->setMessage('Connection ok, bienvenue parmis nous');
+            $this->getModel()->setMessage('Connection réussie, bon retour parmis nous');
             $this->getModel()->setLogin($_POST['nickname']);
             $this->setModel($this->getModel());
         } else {

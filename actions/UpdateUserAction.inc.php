@@ -22,28 +22,25 @@ class UpdateUserAction extends Action {
 	 * @see Action::run()
 	 */
 	public function run() {
+		$this->setModel(new MessageModel());
+		if(empty($_POST['updatePassword1']) || empty($_POST['updatePassword2'])) {
+            $this->getModel()->setMessage('Veuillez remplir tous les champs');
+			$this->createUpdateUserFormView($this->getModel());
+		}
+		if ($_POST['updatePassword1'] !== $_POST['updatePassword2']) {
+            $this->getModel()->setMessage('Les mots de passe ne sont pas identiques');
+			$this->createUpdateUserFormView($this->getModel());
+		}
+        if ($this->database->updateUser($this->getSessionLogin(), $_POST['updatePassword1']) === true) {
+            $this->getModel()->setMessage('Modification enregistrée...');
+            $this->setView(getViewByName("Message"));
 
-		$message = '';
-		if (isset($_POST['updatePassword1'], $_POST['updatePassword2']) && $_POST['updatePassword1'] === $_POST['updatePassword2']){
-			$this->connection->updateUser($this->getSessionLogin(), $_POST['updatePassword1']){
-			$user = $this->database->query(
-				$nickname == $_POST('login');
-				"SELECT * FROM users WHERE nickname == $this->nickname "
-				"UPDATE users
-				SET password='1234'
-				WHERE nickname='benoit'"
-			);
+        }
 
-		}
-		if(!isset($_POST['updatePassword1'], $_POST['updatePassword2'])) {
-			$message = 'Veuillez remplir tous les champs';
-		}
-		if (!($_POST['updatePassword1'] === $_POST['updatePassword2'])) {
-			$message = 'Les mots de passe ne sont pas identiques';
-		}
 	}
 
-	private function createUpdateUserFormView($message) {
+	private function createUpdateUserFormView($message): void
+    {
 		$this->setModel(new MessageModel());
 		$this->getModel()->setMessage($message);
 		$this->getModel()->setLogin($this->getSessionLogin());

@@ -24,12 +24,12 @@ function getAction() {
 		'SignUp',
 		'SignUpForm',
 		'UpdateUserForm',
-
+		'UpdateUser',
 /*
 
 
 
-			'UpdateUser',
+
 			'AddSurveyForm',
 			'AddSurvey',
 			'GetMySurveys',
