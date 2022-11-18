@@ -22,16 +22,17 @@ class UpdateUserAction extends Action {
 	 * @see Action::run()
 	 */
 	public function run() {
-		$this->setModel(new MessageModel());
+
 		if(empty($_POST['updatePassword1']) || empty($_POST['updatePassword2'])) {
-            $this->getModel()->setMessage('Veuillez remplir tous les champs');
-			$this->createUpdateUserFormView($this->getModel());
+            $this->createUpdateUserFormView('Veuillez remplir tous les champs');
+
 		}
 		if ($_POST['updatePassword1'] !== $_POST['updatePassword2']) {
-            $this->getModel()->setMessage('Les mots de passe ne sont pas identiques');
-			$this->createUpdateUserFormView($this->getModel());
+            $this->createUpdateUserFormView('Les mots de passe ne sont pas identiques');
+
 		}
         if ($this->database->updateUser($this->getSessionLogin(), $_POST['updatePassword1']) === true) {
+            $this->setModel(new MessageModel());
             $this->getModel()->setMessage('Modification enregistrée...');
             $this->setView(getViewByName("Message"));
 
