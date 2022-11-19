@@ -5,7 +5,6 @@ require_once("models/Response.inc.php");
 class Database {
 
 	private PDO $connection;
-
 	/**
 	 * Ouvre la base de données. Si la base n'existe pas elle
 	 * est créée à l'aide de la méthode createDataBase().
@@ -21,7 +20,6 @@ class Database {
 			$this->createDataBase();
 		}
 	}
-
 
 	/**
 	 * Crée la base de données ouverte dans la variable $connection.
@@ -247,10 +245,17 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 * Charge l'ensemble des sondages dont la question contient un mot clé.
 	 *
 	 * @param string $keyword Mot clé à chercher.
-	 * @return array(Survey)|boolean Sondages trouvés par la fonction ou false si une erreur s'est produite.
+	 * @return bool|array(Survey)|boolean Sondages trouvés par la fonction ou false si une erreur s'est produite.
 	 */
 	public function loadSurveysByKeyword($keyword) {
-		/* TODO  */
+		$survey = $this->connection->query(
+			"SELECT * FROM surveys WHERE question LIKE '%$keyword'",
+			PDO::FETCH_OBJ
+		)->fetchAll();
+		if($survey) {
+			return $survey;
+		}
+		return false;
 	}
 
 
@@ -261,7 +266,13 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 * @return boolean True si le vote a été enregistré, false sinon.
 	 */
 	public function vote($id) {
-		/* TODO  */
+		if(!$this->connection->query(
+			"UPDATE response SET count=count++ WHERE id='$id'",
+			PDO::FETCH_OBJ
+		)){
+			return false;
+		}
+		return true;
 	}
 
 	/**
@@ -269,11 +280,26 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 * Ce tableau a été obtenu à l'aide de la méthode fetchAll() de PDO.
 	 *
 	 * @param array $arraySurveys Tableau de lignes.
-	 * @return array(Survey)|boolean Le tableau de sondages ou false si une erreur s'est produite.
+	 * @return array | bool tableau de sondages ou false si une erreur s'est produite.
 	 */
 	private function loadSurveys($arraySurveys) {
+		$q = $this->connection->query(
+			"SELECT * FROM surveys",
+			PDO::FETCH_OBJ
+		)->fetchAll();
+		if(count($q) !== 0) {
+			return false;
+		}
+
 		$surveys = array();
-		/* TODO  */
+		foreach ($arraySurveys as $survey) {
+			$survey = `<tr>
+					  <td>$this->$survey->id</td>
+					  <td>$this->$survey->owner</td>
+					  <td>$this->$survey->question</td>
+					</tr>`;
+			$surveys[] = $survey;
+		}
 		return $surveys;
 	}
 
@@ -285,7 +311,17 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 * @return array(Response)|boolean Le tableau de réponses ou false si une erreur s'est produite.
 	 */
 	private function loadResponses(&$survey, $arrayResponses) {
-		/* TODO  */
+		$responses = array();
+		foreach ($arrayResponses as $response) {
+			$resp = `<tr>
+					  <td>$this->$response->id</td>
+					  <td>$this->$response->id_survey</td>
+					  <td>$this->$response->title</td>
+					  <td>$this->$response->count</td>
+					</tr>`;
+			$responses[] = $resp;
+		}
+		return $responses;
 	}
 
 }

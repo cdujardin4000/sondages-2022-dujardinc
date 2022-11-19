@@ -28,16 +28,9 @@ function getAction() {
 		'GetMySurveys',
 		'AddSurvey',
 		'AddSurveyForm',
-/*
-
-
-
-
-
-
-
-			'Search',
-			'Vote'*/);
+		'Search',
+		'Vote'
+	);
 
 	if (!in_array($action, $actions)) $action = 'Default';
 	return getActionByName($action);
