@@ -40,11 +40,12 @@ class SearchAction extends Action {
                 foreach ($surveys as $survey){
 
                     $surveysObjectList[] = new Survey($survey['owner'], $survey['question']);
-                    $this->setModel(new SurveysModel());
-                    $this->getModel()->setLogin($this->getSessionLogin());
-                    $this->getModel()->setSurveys($surveysObjectList);
-                    $this->setView(getViewByName('Surveys'));
                 }
+
+                $this->setModel(new SurveysModel());
+                $this->getModel()->setLogin($this->getSessionLogin());
+                $this->getModel()->setSurveys($surveysObjectList);
+                $this->setView(getViewByName('Surveys'));
             }
 		}
 	}
