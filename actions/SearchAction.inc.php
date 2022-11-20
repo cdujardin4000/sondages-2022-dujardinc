@@ -18,30 +18,34 @@ class SearchAction extends Action {
 
 	public function run() {
 
+		if(empty($_POST["keyword"])){
+            $this->setModel(new MessageModel());
+            $this->getModel()->setLogin($this->getSessionLogin());
+            $this->getModel()->setMessage("Vous devez entrer un mot clé avant de lancer la recherche...");
+            $this->setView(getViewByName('Message'));
+		}
+        else {
+            $surveysObjectList = [];
+            $surveys = $this->database->loadSurveysByKeyword($_POST["keyword"]);
 
-		if(!empty($_POST["keyword"])){
+            if ($surveys === false) {
 
-			$surveysObjectList = [];
-			$surveys = $this->database->loadSurveysByKeyword($_POST["keyword"]);
+                $this->setModel(new MessageModel());
+                $this->getModel()->setLogin($this->getSessionLogin());
+                $this->getModel()->setMessage("Pas de sondages trouvés...");
+                $this->setView(getViewByName('Message'));
 
-			if($surveys) {
+            } else {
 
-				foreach ($surveys as $survey){
+                foreach ($surveys as $survey){
 
-					$surveysObjectList[] = new Survey($survey['owner'], $survey['question']);
-				}
-
-				$this->setModel(new SurveysModel());
-				$this->getModel()->setLogin($this->getSessionLogin());
-				$this->getModel()->setSurveys($surveysObjectList);
-				$this->setView(getViewByName('Surveys'));
-			}
-
-		} else {
-
-			$this->setModel(new MessageModel());
-			$this->getModel()->setMessage("Vous devez entrer un mot clé avant de lancer la recherche...");
-			$this->setView(getViewByName('Message'));
+                    $surveysObjectList[] = new Survey($survey['owner'], $survey['question']);
+                    $this->setModel(new SurveysModel());
+                    $this->getModel()->setLogin($this->getSessionLogin());
+                    $this->getModel()->setSurveys($surveysObjectList);
+                    $this->setView(getViewByName('Surveys'));
+                }
+            }
 		}
 	}
 }
