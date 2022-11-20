@@ -40,10 +40,12 @@ class AddSurveyAction extends Action {
         }
 
         if($errorMessage !== "") {
+
             $this->setModel(new MessageModel());
             $this->getModel()->setLogin($this->getSessionLogin());
             $this->getModel()->setMessage($errorMessage);
         } else {
+
             $survey = new Survey($this->getSessionLogin(), htmlentities($_POST['questionSurvey']));
             $survey->addResponse( htmlentities($_POST['responseSurvey1']));
             $survey->addResponse( htmlentities($_POST['responseSurvey2']));
@@ -72,50 +74,6 @@ class AddSurveyAction extends Action {
             $this->getModel()->setMessage('Votre sondage à bien été enregistré');
         }
         $this->setView(getViewByName('AddSurveyForm'));
-
-
-        /** //var_dump($_POST['questionSurvey']);die;
-		if($_POST['questionSurvey'] == ""){
-
-            $this->setModel(new MessageModel());
-            $this->getModel()->setLogin($this->getSessionLogin());
-            $this->getModel()->setMessage('La question est obligatoire');
-		}
-
-		if($_POST['responseSurvey1'] === "" || $_POST(['responseSurvey2']) === ""){
-
-            $this->setModel(new MessageModel());
-            $this->getModel()->setLogin($this->getSessionLogin());
-            $this->getModel()->setMessage('Vous devez proposer au moins 2 réponses');
-		}
-
-		$survey = new Survey($this->getSessionLogin(), htmlentities($_POST['questionSurvey']));
-		$survey->addResponse( htmlentities($_POST['responseSurvey1']));
-		$survey->addResponse( htmlentities($_POST['responseSurvey2']));
-
-		if (!empty($_POST['responseSurvey3'])){
-
-			$survey->addResponse( htmlentities($_POST['responseSurvey3']));
-		}
-		if (!empty($_POST['responseSurvey4'])){
-
-			$survey->addResponse( htmlentities($_POST['responseSurvey4']));
-		}
-		if (!empty($_POST['responseSurvey5'])){
-
-			$survey->addResponse( htmlentities($_POST['responseSurvey5']));
-		}
-        foreach ($survey->getResponses() as $response){
-
-            $this->database->saveResponse($response);
-        }
-
-		$this->database->saveSurvey($survey);
-
-        $this->setModel(new MessageModel());
-        $this->getModel()->setLogin($this->getSessionLogin());
-        $this->getModel()->setMessage('Votre sondage à bien été enregistré');
-        $this->setView(getViewByName('AddSurveyForm'));**/
 	}
 }
 
