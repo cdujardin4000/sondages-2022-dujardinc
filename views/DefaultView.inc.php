@@ -13,5 +13,5 @@ class DefaultView extends View {
 	protected function displayBody($model) { }
 
 }
-?>
+
 

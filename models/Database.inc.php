@@ -13,7 +13,9 @@ class Database {
 
 		$this->connection = new PDO("sqlite:database.sqlite");
 
-		$q = $this->connection->query('SELECT name FROM sqlite_master WHERE type="table"');
+		$q = $this->connection->query(
+            'SELECT name FROM sqlite_master WHERE type="table"'
+        );
 
 		if (count($q->fetchAll()) === 0) {
 
@@ -35,17 +37,20 @@ class Database {
 	private function createDataBase(): void
 	{
 		$this->connection->query(
+
 			'CREATE TABLE users(
     		nickname char (20),
     		password char (50))'
 		);
 		$this->connection->query(
+
 			'CREATE TABLE surveys(
     		id INTEGER PRIMARY KEY AUTOINCREMENT,
     		owner char (20),
 			question char (255))'
     	);
 		$this->connection->query(
+
 			'CREATE TABLE responses(
     		id INTEGER PRIMARY KEY AUTOINCREMENT,
     		idSurvey INTEGER,
@@ -64,6 +69,7 @@ class Database {
 	private function checkNicknameValidity(string $nickname): bool
 	{
 		if (!(strlen($nickname) > 2 && strlen($nickname) < 11 && ctype_alpha($nickname))) {
+
 			return 1;
 		}
 		return 0;
@@ -79,6 +85,7 @@ class Database {
 	private function checkPasswordValidity(string $password): bool
 	{
 		if (!(strlen($password) > 2 && strlen($password) < 11)) {
+
 			return 2;
 		}
 		return 0;
@@ -93,10 +100,13 @@ class Database {
 	private function checkNicknameAvailability(string $nickname): bool
 	{
 		$response = $this->connection->query(
+
 			"SELECT * FROM users WHERE nickname=='$nickname'"
+
 		)->fetchall(PDO::FETCH_OBJ);
-var_dump('response count: ',count($response), 'reponse: ', $response);
+
 		if (count($response) !== 0) {
+
 			return 3;
 		}
 		return 0;
@@ -111,12 +121,18 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 */
 	public function checkPassword(string $nickname, string $password): bool
 	{
-		$response = $this->connection->query(
-			"SELECT * FROM users WHERE nickname=='$nickname'"
-		)->fetch(PDO::FETCH_OBJ);
-		var_dump($response->nickname);
-		var_dump($response->password);
-		return $response->nickname === $nickname && $response->password === $password;
+        if ($nickname !== "" && $password !== "") {
+
+        $response = $this->connection->query(
+
+            "SELECT * FROM users WHERE nickname=='$nickname'"
+
+        )->fetch(PDO::FETCH_OBJ);
+
+            return $response->nickname === $nickname && $response->password === $password;
+         }
+
+         return false;
 	}
 
 	/**
@@ -134,25 +150,28 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	{
 		$err_mess = "";
 
-		if($this->checkNicknameValidity($nickname) != 0) {
-			var_dump(1);
+		if($this->checkNicknameValidity($nickname) !== 0) {
+
 			$err_mess .= "Le pseudo doit contenir entre 3 et 10 lettres...\n";
 		}
 
-		if($this->checkPasswordValidity($password) != 0) {
-			var_dump(2);
+		if($this->checkPasswordValidity($password) !== 0) {
+
 			$err_mess .= "Le mot de passe doit contenir entre 3 et 10 caractères...\n";
 		}
 
-		if($this->checkNicknameAvailability($nickname) != 0) {
-			var_dump(3);
+		if($this->checkNicknameAvailability($nickname) !== 0) {
+
 			$err_mess .= "Le pseudo existe déjà...\n";
 		}
 
 		if($err_mess !== "") {
+
 			return $err_mess;
 		}
+
 		$this->connection->exec(
+
 			"INSERT INTO users (nickname, password) VALUES ('$nickname', '$password')"
 		);
 
@@ -175,7 +194,12 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 
 			return "Le mot de passe doit contenir entre 3 et 10 caractères...\n";
 		}
-		$stmt = $this->connection->prepare("UPDATE users SET password=? WHERE nickname=?");
+
+		$stmt = $this->connection->prepare(
+
+            "UPDATE users SET password=? WHERE nickname=?"
+        );
+
 		return $stmt->execute([$password, $nickname]);
 	}
 
@@ -188,11 +212,15 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 */
 	public function saveSurvey($survey) {
 		$survey_id = $this->connection->query(
+
 			"SELECT id FROM surveys ORDER BY id DESC LIMIT 1"
+
 		)->fetch(PDO::FETCH_OBJ);
 
 		$stmt = $this->connection->prepare(
+
 			"INSERT INTO surveys (id, question, owner) VALUES (:id, :question, :owner)"
+
 		);
 		$stmt->execute([
 			':id' => ++$survey_id->id ,
@@ -208,18 +236,27 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 * @return boolean True si la sauvegarde a été réalisée avec succès, false sinon.
 	 */
 	public function saveResponse($response) {
+
 		$survey_id = $this->connection->query(
+
 			"SELECT id FROM surveys ORDER BY id DESC LIMIT 1"
+
 		)->fetch(PDO::FETCH_OBJ);
+
 		$response_id = $this->connection->query(
+
 			"SELECT id FROM responses ORDER BY id DESC LIMIT 1"
+
 		)->fetch(PDO::FETCH_OBJ);
+
 		$stmt = $this->connection->prepare(
+
 			"INSERT INTO responses (id, id_survey, title) VALUES (:id, :id_survey ,:title)"
 		);
+
 		$stmt->execute([
 			':id' => ++$response_id->id,
-			':id_survey' => ++$survey_id->id,
+			':id_survey' => $survey_id->id,
 			':title' => $response
 		]);
 	}
@@ -231,11 +268,16 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 * @return bool|array(Survey)| Sondages trouvés par la fonction ou false si une erreur s'est produite.
 	 */
 	public function loadSurveysByOwner($owner) {
+
 		$surveys = $this->connection->query(
+
 			"SELECT * FROM surveys WHERE owner='$owner'",
-			PDO::FETCH_OBJ
+			PDO::FETCH_ASSOC
+
 		)->fetchAll();
+
 		if($surveys) {
+
 			return $surveys;
 		}
 		return false;
@@ -248,16 +290,18 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 * @return bool|array(Survey)|boolean Sondages trouvés par la fonction ou false si une erreur s'est produite.
 	 */
 	public function loadSurveysByKeyword($keyword) {
-		$survey = $this->connection->query(
-			"SELECT * FROM surveys WHERE question LIKE '%$keyword'",
-			PDO::FETCH_OBJ
+
+		$surveys = $this->connection->query(
+
+			"SELECT * FROM surveys WHERE question LIKE '%$keyword%'",
+			PDO::FETCH_ASSOC
+
 		)->fetchAll();
 		if($survey) {
 			return $survey;
 		}
 		return false;
 	}
-
 
 	/**
 	 * Enregistre le vote d'un utilisateur pour la réponse d'indentifiant $id.
@@ -266,9 +310,12 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 * @return boolean True si le vote a été enregistré, false sinon.
 	 */
 	public function vote($id) {
+
 		if(!$this->connection->query(
+
 			"UPDATE response SET count=count++ WHERE id='$id'",
 			PDO::FETCH_OBJ
+
 		)){
 			return false;
 		}
@@ -283,21 +330,23 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 * @return array | bool tableau de sondages ou false si une erreur s'est produite.
 	 */
 	private function loadSurveys($arraySurveys) {
+
 		$q = $this->connection->query(
+
 			"SELECT * FROM surveys",
 			PDO::FETCH_OBJ
+
 		)->fetchAll();
+
 		if(count($q) !== 0) {
+
 			return false;
 		}
 
-		$surveys = array();
+		$surveys = [];
+
 		foreach ($arraySurveys as $survey) {
-			$survey = `<tr>
-					  <td>$this->$survey->id</td>
-					  <td>$this->$survey->owner</td>
-					  <td>$this->$survey->question</td>
-					</tr>`;
+
 			$surveys[] = $survey;
 		}
 		return $surveys;
@@ -307,23 +356,31 @@ var_dump('response count: ',count($response), 'reponse: ', $response);
 	 * Construit un tableau de réponses à partir d'un tableau de ligne de la table 'responses'.
 	 * Ce tableau a été obtenu à l'aide de la méthode fetchAll() de PDO.
 	 *
-	 * @param array $arraySurveys Tableau de lignes.
-	 * @return array(Response)|boolean Le tableau de réponses ou false si une erreur s'est produite.
+	 * @param array $arrayResponses Tableau de lignes.
+	 * @return array|boolean Le tableau de réponses ou false si une erreur s'est produite.
 	 */
-	private function loadResponses(&$survey, $arrayResponses) {
-		$responses = array();
+	private function loadResponses($arrayResponses) {
+
+		$q = $this->connection->query(
+
+			"SELECT * FROM responses",
+			PDO::FETCH_OBJ
+
+		)->fetchAll();
+
+		if(count($q) === 0) {
+
+			return false;
+		}
+
+		$responses = [];
+
 		foreach ($arrayResponses as $response) {
-			$resp = `<tr>
-					  <td>$this->$response->id</td>
-					  <td>$this->$response->id_survey</td>
-					  <td>$this->$response->title</td>
-					  <td>$this->$response->count</td>
-					</tr>`;
-			$responses[] = $resp;
+
+			$responses[] = $response;
 		}
 		return $responses;
 	}
-
 }
 
-?>
+

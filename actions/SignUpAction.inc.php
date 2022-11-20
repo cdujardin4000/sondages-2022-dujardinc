@@ -26,29 +26,34 @@ class SignUpAction extends Action {
 		$this->setModel(new MessageModel());
 
 		if ($_POST['signUpPassword1'] !== $_POST['signUpPassword2']) {
+
 			$message = "Le mot de passe et sa confirmation sont différents...";
+
 		} else {
+
 			$message = $this->database->addUser($_POST['signUpLogin'], $_POST['signUpPassword1']);
 		}
+
 		if($message == 0){
+
 			$this->setSessionLogin($_POST['signUpLogin']);
 			$this->getModel()->setLogin($_POST['signUpLogin']);
 			$this->getModel()->setMessage("Votre compte à bien été crée, nous sommes heureux de vous compter parmis nous!!!");
 			$this->setView(getViewByName('Message'));
+
 		} else {
+
 			$this->getModel()->setMessage($message);
 			$this->createSignUpFormView($message);
 		}
 	}
 
-	private function createSignUpFormView($message) {
+	private function createSignUpFormView($message): void
+    {
+
 		$this->setModel(new MessageModel());
 		$this->getModel()->setMessage($message);
 		$this->getModel()->setLogin($this->getSessionLogin());
 		$this->setView(getViewByName("SignUpForm"));
 	}
-
 }
-
-
-?>

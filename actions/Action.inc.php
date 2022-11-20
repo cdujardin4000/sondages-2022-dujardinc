@@ -4,9 +4,9 @@ require_once("models/MessageModel.inc.php");
 require_once("models/Database.inc.php");
 
 abstract class Action {
-	private $view;
-	private $model;
-	protected $database;
+	private ?View $view;
+	private ?Model $model;
+	protected Database $database;
 
 	/**
 	 * Construit une instance de la classe Action.
@@ -22,7 +22,8 @@ abstract class Action {
 	 *
 	 * @param View $view Vue qui doit être affichée par le contrôleur.
 	 */
-	protected function setView($view) {
+	protected function setView(View $view): void
+	{
 		$this->view = $view;
 	}
 
@@ -31,28 +32,28 @@ abstract class Action {
 	 *
 	 * @param Model $model Modèle à fournir à la vue.
 	 */
-	protected function setModel($model) {
+	protected function setModel(Model $model): void
+	{
 		$this->model = $model;
 	}
 
 	/**
 	 * Récupére la pseudonyme de l'utilisateur s'il est connecté, ou null sinon.
 	 *
-	 * @return string Pseudonyme de l'utilisateur ou null.
+	 * @return string|null Pseudonyme de l'utilisateur ou null.
 	 */
-	protected function getSessionLogin() {
-		if (isset($_SESSION['login'])) {
-			$login = $_SESSION['login'];
-		} else $login = null;
-		return $login;
+	protected function getSessionLogin(): ?string
+	{
+		return $_SESSION['login'] ?? null;
 	}
 
 	/**
 	 * Sauvegarde le pseudonyme de l'utilisateur dans la session.
 	 *
-	 * @param string $login Pseudonyme de l'utilisateur.
+	 * @param string|null $login Pseudonyme de l'utilisateur.
 	 */
-	protected function setSessionLogin($login) {
+	protected function setSessionLogin(?string $login): void
+    {
 		$_SESSION['login'] = $login;
 	}
 
@@ -61,7 +62,8 @@ abstract class Action {
 	 * 
 	 * @param string $message Message à afficher à l'utilisateur.
 	 */
-	protected function setMessageView($message) {
+	protected function setMessageView(string $message): void
+    {
 		$this->setModel(new MessageModel());
 		$this->getModel()->setMessage($message);
 		$this->getModel()->setLogin($this->getSessionLogin());
@@ -70,19 +72,21 @@ abstract class Action {
 
 	/**
 	 * Retourne la vue qui doit être affichée par le contrôleur.
-	 * 
-	 * @return View Vue qui doit être affichée par le contrôleur.
+	 *
+	 * @return View|null Vue qui doit être affichée par le contrôleur.
 	 */
-	public function getView() {
+	public function getView(): ?View
+	{
 		return $this->view;
 	}
 
 	/**
 	 * Retourne le modèle qui doit être donnée à la vue par le contrôleur.
 	 *
-	 * @return Model Modèle à fournir à la vue.
+	 * @return Model|null Modèle à fournir à la vue.
 	 */
-	public function getModel() {
+	public function getModel(): ?Model
+	{
 		return $this->model;
 	}
 
@@ -92,4 +96,4 @@ abstract class Action {
 	 */
 	abstract public function run();
 }
-?>
+

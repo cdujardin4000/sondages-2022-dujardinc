@@ -6,7 +6,7 @@ class MessageModel extends Model {
 	/**
 	 * @var string Message à afficher à l'utilisateur.
 	 */
-	private $message;
+	private string $message;
 
 	/** 
 	 * Construit une instance de la classe 'MessageModel'.
@@ -21,7 +21,8 @@ class MessageModel extends Model {
 	 * 
 	 * @return string Message stocké dans le modèle.
 	 */
-	public function getMessage() {
+	public function getMessage(): string
+	{
 		return $this->message;
 	}
 
@@ -30,9 +31,10 @@ class MessageModel extends Model {
 	 * 
 	 * @param string $message Message à stocké dans le modèle.
 	 */
-	public function setMessage($message) {
+	public function setMessage($message): void
+	{
 	  	$this->message = $message;
 	}
 
 }
-?>
+

@@ -20,6 +20,7 @@ class SurveysView extends View {
 		foreach ($model->getSurveys() as $survey) {
 
 
+
 			require("templates/survey.inc.php");
 		}
 	}
