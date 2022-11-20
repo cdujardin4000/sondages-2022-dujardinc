@@ -13,9 +13,7 @@ class Database {
 
 		$this->connection = new PDO("sqlite:database.sqlite");
 
-		$q = $this->connection->query(
-            'SELECT name FROM sqlite_master WHERE type="table"'
-        );
+		$q = $this->connection->query('SELECT name FROM sqlite_master WHERE type="table"');
 
 		if (count($q->fetchAll()) === 0) {
 
@@ -37,20 +35,17 @@ class Database {
 	private function createDataBase(): void
 	{
 		$this->connection->query(
-
 			'CREATE TABLE users(
     		nickname char (20),
     		password char (50))'
 		);
 		$this->connection->query(
-
 			'CREATE TABLE surveys(
     		id INTEGER PRIMARY KEY AUTOINCREMENT,
     		owner char (20),
 			question char (255))'
     	);
 		$this->connection->query(
-
 			'CREATE TABLE responses(
     		id INTEGER PRIMARY KEY AUTOINCREMENT,
     		idSurvey INTEGER,
@@ -121,18 +116,13 @@ class Database {
 	 */
 	public function checkPassword(string $nickname, string $password): bool
 	{
-        if ($nickname !== "" && $password !== "") {
+		$response = $this->connection->query(
 
-        $response = $this->connection->query(
+			"SELECT * FROM users WHERE nickname=='$nickname'"
 
-            "SELECT * FROM users WHERE nickname=='$nickname'"
+		)->fetch(PDO::FETCH_OBJ);
 
-        )->fetch(PDO::FETCH_OBJ);
-
-            return $response->nickname === $nickname && $response->password === $password;
-         }
-
-         return false;
+		return $response->nickname === $nickname && $response->password === $password;
 	}
 
 	/**
@@ -166,12 +156,9 @@ class Database {
 		}
 
 		if($err_mess !== "") {
-
 			return $err_mess;
 		}
-
 		$this->connection->exec(
-
 			"INSERT INTO users (nickname, password) VALUES ('$nickname', '$password')"
 		);
 
@@ -194,12 +181,7 @@ class Database {
 
 			return "Le mot de passe doit contenir entre 3 et 10 caractères...\n";
 		}
-
-		$stmt = $this->connection->prepare(
-
-            "UPDATE users SET password=? WHERE nickname=?"
-        );
-
+		$stmt = $this->connection->prepare("UPDATE users SET password=? WHERE nickname=?");
 		return $stmt->execute([$password, $nickname]);
 	}
 
@@ -256,7 +238,7 @@ class Database {
 
 		$stmt->execute([
 			':id' => ++$response_id->id,
-			':id_survey' => $survey_id->id,
+			':id_survey' => ++$survey_id->id,
 			':title' => $response
 		]);
 	}
@@ -297,11 +279,14 @@ class Database {
 			PDO::FETCH_ASSOC
 
 		)->fetchAll();
-		if($survey) {
-			return $survey;
+
+		if($surveys) {
+
+			return $surveys;
 		}
 		return false;
 	}
+
 
 	/**
 	 * Enregistre le vote d'un utilisateur pour la réponse d'indentifiant $id.
@@ -337,14 +322,11 @@ class Database {
 			PDO::FETCH_OBJ
 
 		)->fetchAll();
-
 		if(count($q) !== 0) {
-
 			return false;
 		}
 
-		$surveys = [];
-
+		$surveys = array();
 		foreach ($arraySurveys as $survey) {
 
 			$surveys[] = $survey;
@@ -352,35 +334,31 @@ class Database {
 		return $surveys;
 	}
 
-	/**
-	 * Construit un tableau de réponses à partir d'un tableau de ligne de la table 'responses'.
-	 * Ce tableau a été obtenu à l'aide de la méthode fetchAll() de PDO.
-	 *
-	 * @param array $arrayResponses Tableau de lignes.
-	 * @return array|boolean Le tableau de réponses ou false si une erreur s'est produite.
-	 */
+    /**
+     * Construit un tableau de réponses à partir d'un tableau de ligne de la table 'responses'.
+     * Ce tableau a été obtenu à l'aide de la méthode fetchAll() de PDO.
+     *
+     * @param $arrayResponses
+     * @return array|boolean Le tableau de réponses ou false si une erreur s'est produite.
+     */
 	private function loadResponses($arrayResponses) {
-
 		$q = $this->connection->query(
-
 			"SELECT * FROM responses",
 			PDO::FETCH_OBJ
-
 		)->fetchAll();
-
 		if(count($q) === 0) {
-
 			return false;
 		}
 
-		$responses = [];
 
+		$responses = array();
 		foreach ($arrayResponses as $response) {
 
 			$responses[] = $response;
 		}
 		return $responses;
 	}
+
 }
 
 
