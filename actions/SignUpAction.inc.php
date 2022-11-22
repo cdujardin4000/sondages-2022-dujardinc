@@ -32,20 +32,21 @@ class SignUpAction extends Action {
 		} else {
 
 			$message = $this->database->addUser($_POST['signUpLogin'], $_POST['signUpPassword1']);
+            if($message === "Votre compte à bien été crée, nous sommes heureux de vous compter parmis nous!!!"){
+
+                $this->setSessionLogin($_POST['signUpLogin']);
+                $this->getModel()->setLogin($_POST['signUpLogin']);
+                $this->getModel()->setMessage($message);
+                $this->setView(getViewByName('Message'));
+
+            }
 		}
 
-		if($message == 0){
+        $this->getModel()->setMessage($message);
+        $this->createSignUpFormView($message);
 
-			$this->setSessionLogin($_POST['signUpLogin']);
-			$this->getModel()->setLogin($_POST['signUpLogin']);
-			$this->getModel()->setMessage("Votre compte à bien été crée, nous sommes heureux de vous compter parmis nous!!!");
-			$this->setView(getViewByName('Message'));
 
-		} else {
 
-			$this->getModel()->setMessage($message);
-			$this->createSignUpFormView($message);
-		}
 	}
 
 	private function createSignUpFormView($message): void

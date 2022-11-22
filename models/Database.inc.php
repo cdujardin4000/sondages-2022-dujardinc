@@ -63,7 +63,7 @@ class Database {
 	 */
 	private function checkNicknameValidity(string $nickname): bool
 	{
-		if (!(strlen($nickname) > 2 && strlen($nickname) < 11 && ctype_alpha($nickname))) {
+		if (!(strlen($nickname) > 2) || !(strlen($nickname) < 11) || !ctype_alpha($nickname)) {
 
 			return 1;
 		}
@@ -79,7 +79,7 @@ class Database {
 	 */
 	private function checkPasswordValidity(string $password): bool
 	{
-		if (!(strlen($password) > 2 && strlen($password) < 11)) {
+		if (!(strlen($password) > 2) || !(strlen($password) < 11)) {
 
 			return 2;
 		}
@@ -140,17 +140,17 @@ class Database {
 	{
 		$err_mess = "";
 
-		if($this->checkNicknameValidity($nickname) !== 0) {
+		if($this->checkNicknameValidity($nickname) == 1) {
 
 			$err_mess .= "Le pseudo doit contenir entre 3 et 10 lettres...\n";
 		}
 
-		if($this->checkPasswordValidity($password) !== 0) {
+		if($this->checkPasswordValidity($password) == 2) {
 
 			$err_mess .= "Le mot de passe doit contenir entre 3 et 10 caractères...\n";
 		}
 
-		if($this->checkNicknameAvailability($nickname) !== 0) {
+		if($this->checkNicknameAvailability($nickname) == 3) {
 
 			$err_mess .= "Le pseudo existe déjà...\n";
 		}
@@ -162,7 +162,7 @@ class Database {
 			"INSERT INTO users (nickname, password) VALUES ('$nickname', '$password')"
 		);
 
-		return 0;
+		return "Votre compte à bien été crée, nous sommes heureux de vous compter parmis nous!!!";
 	}
 
 	/**
